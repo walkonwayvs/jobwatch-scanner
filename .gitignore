@@ -1,0 +1,9 @@
+token.txt
+config.json
+seen.json
+heartbeat.txt
+*.log
+*.log.old
+*.tmp
+__pycache__/
+*.pyc
