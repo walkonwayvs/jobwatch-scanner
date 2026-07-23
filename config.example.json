@@ -1,0 +1,87 @@
+{
+  "_comment": "Copy to config.json and edit. config.json is gitignored.",
+
+  "discord_webhook": "https://discord.com/api/webhooks/YOUR/WEBHOOK",
+
+  "max_alerts_per_run": 8,
+  "heartbeat_days": 7,
+
+  "role_keywords": [
+    "qa", "quality assurance", "test engineer", "testing engineer",
+    "sdet", "test automation", "node operator", "infrastructure engineer",
+    "devnet", "vacancy", "hiring", "job posting", "open role"
+  ],
+
+  "domain_keywords": [
+    "crypto", "web3", "blockchain", "protocol", "node", "validator",
+    "decentralized", "depin", "defi", "testnet", "onchain",
+    "cosmos", "ethereum", "solana", "usdc", "usdt", "stablecoin"
+  ],
+
+  "exclude": [
+    "sales", "marketing", "social media", "recruiter", "designer",
+    "account executive", "customer success", "business development"
+  ],
+
+  "body_keywords": [
+    "QA engineer", "test engineer", "node qa", "node testing",
+    "validator testing", "paid tester", "paid testing", "paid audit",
+    "contract auditor", "paid tasks", "per task", "paid in crypto",
+    "we are hiring", "contract role", "part-time role", "freelance",
+    "contractor", "external tester", "test lab", "stress test",
+    "alphanet", "pre-testnet", "incentivized testnet",
+    "bounty", "grant", "stipend", "retainer", "USDT", "USDC",
+    "deliverables", "scope of work", "qualifications", "paid"
+  ],
+
+  "job_boards": [
+    { "name": "Example Co", "type": "greenhouse", "token": "examplecompany" },
+    { "name": "Another Co", "type": "lever",      "token": "anothercompany" },
+    { "name": "Third Co",   "type": "ashby",      "token": "third-company" },
+    { "name": "Fourth Co",  "type": "recruitee",  "token": "fourthcompany" }
+  ],
+
+  "broad_boards": [
+    { "name": "RemoteOK",       "type": "remoteok", "url": "https://remoteok.com/api" },
+    { "name": "WeWorkRemotely", "type": "rss",      "url": "https://weworkremotely.com/remote-jobs.rss" }
+  ],
+
+  "github_repos": [
+    { "repo": "owner/repo-you-care-about" },
+    { "repo": "owner/another-repo", "branch": "master" }
+  ],
+
+  "discussion_search": [
+    "testnet QA hiring",
+    "paid testing contract testnet",
+    "community devnet testing",
+    "external tester program"
+  ],
+
+  "github_search": [
+    { "type": "issues",       "query": "\"QA engineer\" blockchain in:title state:open is:issue" },
+    { "type": "repositories", "query": "testnet QA hiring in:name,description" }
+  ],
+
+  "project_search": [
+    "run a validator node testnet",
+    "node operator onboarding",
+    "early node operators wanted",
+    "devnet launch participants"
+  ],
+
+  "project_keywords": [
+    "testnet", "devnet", "alphanet", "validator", "node operator",
+    "run a node", "node setup", "incentiv", "points program", "airdrop",
+    "mainnet launch", "node software", "prover", "sequencer", "rollup"
+  ],
+
+  "project_orgs_only": true,
+  "project_max_stars": 500,
+  "project_max_per_repo": 1,
+  "project_exclude_orgs": [
+    "ethereum-optimism", "filecoin-project", "ethereumclassic",
+    "farcasterxyz", "iotaledger", "canton-network", "ethereum",
+    "near", "solana-labs", "cosmos", "akash-network", "microsoft"
+  ]
+}
