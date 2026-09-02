@@ -300,6 +300,57 @@ class AtomParser(FeedParser):
     pass
 
 
+
+def check_forums(config, seen):
+    """Watch DAO governance forums. Discourse exposes /latest.json
+    publicly with no key - this is where funding proposals for
+    external testing, audits and service providers get born."""
+    forums = config.get("forums", [])
+    if not forums:
+        return []
+    kws = [k.lower() for k in config.get("forum_keywords", [])]
+    hits = []
+    for f in forums:
+        name, host = f["name"], f["host"].rstrip("/")
+        raw = fetch(f"{host}/latest.json")
+        if raw is None:
+            continue
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            log(f"  - {name}: not a discourse feed")
+            continue
+        topics = ((data.get("topic_list") or {}).get("topics") or [])
+        if not topics:
+            log(f"  - {name}: no topics parsed")
+            continue
+        kept = 0
+        for t in topics:
+            tid = t.get("id")
+            key = f"forum:{name}:{tid}"
+            if key in seen:
+                continue
+            seen[key] = int(time.time())
+            title = t.get("title", "")
+            tl = title.lower()
+            hit = next((k for k in kws if k in tl), None)
+            if not hit:
+                continue
+            tech = [w.lower() for w in config.get("forum_tech_keywords", [])]
+            if tech:
+                t2 = next((w for w in tech if w in tl), None)
+                if not t2:
+                    continue
+                hit = f"{hit} + {t2}"
+            slug = t.get("slug", "")
+            hits.append({"source": name, "title": title, "detail": "",
+                         "url": f"{host}/t/{slug}/{tid}",
+                         "matched": hit, "label": "JOB"})
+            kept += 1
+        log(f"  - {name}: {len(topics)} topics, {kept} kept")
+    return hits
+
+
 def check_github_repos(config, narrow, seen):
     hits = []
     for repo in config.get("github_repos", []):
@@ -322,7 +373,8 @@ def check_github_repos(config, narrow, seen):
                 if hit:
                     hits.append({"source": f"{slug} ({kind})",
                                  "title": e["title"], "detail": "",
-                                 "url": e["link"], "matched": hit})
+                                 "url": e["link"], "matched": hit,
+                                 "label": "INFRA"})
                 seen[key] = int(time.time())
     return hits
 
@@ -548,6 +600,70 @@ def check_github_search(config, seen, token):
 
 # ---------------------------------------------------------------- output
 
+def check_hackathons(config, seen):
+    """Devpost hackathon feed. Public JSON API, no auth."""
+    cfg = config.get("hackathons", {})
+    if not cfg.get("enabled"):
+        return []
+    min_prize = cfg.get("min_prize", 5000)
+    kw = [k.lower() for k in cfg.get("keywords", [])]
+    hits = []
+    for term in cfg.get("queries", []):
+        url = ("https://devpost.com/api/hackathons?search="
+               + urllib.parse.quote(term)
+               + "&status[]=open&order_by=prize-amount")
+        raw = fetch(url)
+        if raw is None:
+            continue
+        try:
+            data = json.loads(raw)
+        except Exception:
+            continue
+        for h in data.get("hackathons", []):
+            hid = h.get("id")
+            key = f"devpost:{hid}"
+            if key in seen:
+                continue
+            if h.get("invite_only"):
+                continue
+            if h.get("open_state") != "open":
+                continue
+
+            loc = (h.get("displayed_location") or {}).get("location", "")
+            if cfg.get("online_only", True) and "online" not in loc.lower():
+                continue
+
+            if (h.get("prizes_counts") or {}).get("cash", 0) < 1:
+                continue
+
+            prize_raw = h.get("prize_amount") or ""
+            prize_txt = re.sub(r"<[^>]+>", "", prize_raw)
+            digits = re.sub(r"[^0-9]", "", prize_txt)
+            prize = int(digits) if digits else 0
+            if prize < min_prize:
+                continue
+
+            title = h.get("title", "")
+            themes = " ".join(t.get("name", "") for t in h.get("themes", []))
+            blob = f"{title} {themes}".lower()
+            matched = next((k for k in kw if k in blob), None)
+            if kw and not matched:
+                continue
+
+            seen[key] = int(time.time())
+            hits.append({
+                "source": f"devpost ({h.get('organization_name','')})",
+                "title": title,
+                "detail": (f"{prize_txt} · {(h.get('prizes_counts') or {}).get('cash',0)} cash prizes"
+                           f" · {h.get('registrations_count',0)} registered"
+                           f" · {h.get('time_left_to_submission','')}"
+                           f" · {h.get('submission_period_dates','')}"),
+                "url": h.get("url", ""),
+                "matched": matched or term,
+                "label": "HACKATHON",
+            })
+    return hits
+
 def post_discord(webhook, content):
     payload = json.dumps({"content": content, "flags": 4}).encode("utf-8")
     req = urllib.request.Request(
@@ -643,6 +759,8 @@ def main():
     hits += check_named_boards(config, narrow, seen)
     log(" broad boards")
     hits += check_broad_boards(config, broad, seen)
+    log(" forums")
+    hits += check_forums(config, seen)
     log(" github repos")
     hits += check_github_repos(config, narrow, seen)
     log(" github discussions")
@@ -653,6 +771,8 @@ def main():
     hits += check_project_search(config, seen, token)
     log(" github search")
     hits += check_github_search(config, seen, token)
+    log(" hackathons")
+    hits += check_hackathons(config, seen)
 
     seen = prune_seen(seen)
     save_json_file(SEEN_PATH, seen)

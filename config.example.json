@@ -1,87 +1,460 @@
 {
   "_comment": "Copy to config.json and edit. config.json is gitignored.",
-
   "discord_webhook": "https://discord.com/api/webhooks/YOUR/WEBHOOK",
-
   "max_alerts_per_run": 8,
-  "heartbeat_days": 7,
-
   "role_keywords": [
-    "qa", "quality assurance", "test engineer", "testing engineer",
-    "sdet", "test automation", "node operator", "infrastructure engineer",
-    "devnet", "vacancy", "hiring", "job posting", "open role"
+    "qa",
+    "quality assurance",
+    "test engineer",
+    "testing engineer",
+    "sdet",
+    "test automation",
+    "node operator",
+    "infrastructure engineer",
+    "devnet",
+    "vacancy",
+    "hiring",
+    "job posting",
+    "open role",
+    "quantachain",
+    "katenet",
+    "sre",
+    "site reliability",
+    "protocol engineer",
+    "platform engineer",
+    "observability",
+    "devops",
+    "monitoring"
   ],
-
   "domain_keywords": [
-    "crypto", "web3", "blockchain", "protocol", "node", "validator",
-    "decentralized", "depin", "defi", "testnet", "onchain",
-    "cosmos", "ethereum", "solana", "usdc", "usdt", "stablecoin"
+    "crypto",
+    "web3",
+    "blockchain",
+    "protocol",
+    "node",
+    "validator",
+    "decentralized",
+    "decentralised",
+    "depin",
+    "defi",
+    "testnet",
+    "onchain",
+    "on-chain",
+    "cosmos",
+    "ethereum",
+    "solana",
+    "usdc",
+    "usdt",
+    "dai",
+    "stablecoin",
+    "alphanet",
+    "incentivized testnet"
   ],
-
   "exclude": [
-    "sales", "marketing", "social media", "recruiter", "designer",
-    "account executive", "customer success", "business development"
+    "sales",
+    "marketing",
+    "social media",
+    "recruiter",
+    "designer",
+    "account executive",
+    "customer success",
+    "business development"
   ],
-
-  "body_keywords": [
-    "QA engineer", "test engineer", "node qa", "node testing",
-    "validator testing", "paid tester", "paid testing", "paid audit",
-    "contract auditor", "paid tasks", "per task", "paid in crypto",
-    "we are hiring", "contract role", "part-time role", "freelance",
-    "contractor", "external tester", "test lab", "stress test",
-    "alphanet", "pre-testnet", "incentivized testnet",
-    "bounty", "grant", "stipend", "retainer", "USDT", "USDC",
-    "deliverables", "scope of work", "qualifications", "paid"
-  ],
-
   "job_boards": [
-    { "name": "Example Co", "type": "greenhouse", "token": "examplecompany" },
-    { "name": "Another Co", "type": "lever",      "token": "anothercompany" },
-    { "name": "Third Co",   "type": "ashby",      "token": "third-company" },
-    { "name": "Fourth Co",  "type": "recruitee",  "token": "fourthcompany" }
+    {
+      "name": "Tether / QVAC",
+      "type": "recruitee",
+      "token": "tether"
+    },
+    {
+      "name": "Ritual",
+      "type": "greenhouse",
+      "token": "ritual"
+    },
+    {
+      "name": "Pluralis",
+      "type": "ashby",
+      "token": "pluralis-research"
+    },
+    {
+      "name": "Aptos / Shelby",
+      "type": "greenhouse",
+      "token": "aptoslabs"
+    }
   ],
-
   "broad_boards": [
-    { "name": "RemoteOK",       "type": "remoteok", "url": "https://remoteok.com/api" },
-    { "name": "WeWorkRemotely", "type": "rss",      "url": "https://weworkremotely.com/remote-jobs.rss" }
+    {
+      "name": "RemoteOK",
+      "type": "remoteok",
+      "url": "https://remoteok.com/api"
+    },
+    {
+      "name": "WeWorkRemotely",
+      "type": "rss",
+      "url": "https://weworkremotely.com/remote-jobs.rss"
+    }
   ],
-
+  "github_search": [
+    {
+      "type": "issues",
+      "query": "\"QA engineer\" blockchain in:title state:open is:issue"
+    },
+    {
+      "type": "issues",
+      "query": "hiring testing engineer testnet in:title state:open is:issue"
+    },
+    {
+      "type": "repositories",
+      "query": "testnet QA hiring in:name,description"
+    }
+  ],
   "github_repos": [
-    { "repo": "owner/repo-you-care-about" },
-    { "repo": "owner/another-repo", "branch": "master" }
+    {
+      "repo": "gonka-ai/gonka"
+    },
+    {
+      "repo": "paranjko/external-test-lab"
+    },
+    {
+      "repo": "genlayerlabs/skills"
+    },
+    {
+      "repo": "crynux-network/crynux-node"
+    },
+    {
+      "repo": "StabilizerFi/stabilizer-v1"
+    },
+    {
+      "repo": "cestus-network/python-sdk"
+    },
+    {
+      "repo": "geobrowser/geogenesis",
+      "branch": "master"
+    },
+    {
+      "repo": "IncentivNetwork/incentum-pow"
+    },
+    {
+      "repo": "Fortytwo-Network/fortytwo-node-skills"
+    },
+    {
+      "repo": "Fortytwo-Network/fortytwo-node-client"
+    },
+    {
+      "repo": "heurist-network/heurist-agent-framework"
+    },
+    {
+      "repo": "aptos-labs/aptos-core"
+    },
+    {
+      "repo": "bagel-ai/Bagel"
+    },
+    {
+      "repo": "sail-money/Protocol"
+    },
+    {
+      "repo": "sail-money/Sailor"
+    },
+    {
+      "repo": "3jane-protocol/moneymarket-contracts"
+    },
+    {
+      "repo": "3jane-protocol/audits"
+    },
+    {
+      "repo": "3jane-protocol/whitepaper"
+    },
+    {
+      "repo": "quantachain/quanta"
+    }
   ],
-
+  "body_keywords": [
+    "QA engineer",
+    "test engineer",
+    "testing engineer",
+    "node qa",
+    "node testing",
+    "node tester",
+    "validator testing",
+    "validator tester",
+    "paid tester",
+    "paid testing",
+    "paid audit",
+    "contract auditor",
+    "paid tasks",
+    "paid by task",
+    "per task",
+    "per report",
+    "paid in crypto",
+    "paid with crypto",
+    "paying in crypto",
+    "paying with crypto",
+    "we are hiring",
+    "we're hiring",
+    "hiring",
+    "contract job",
+    "contract position",
+    "contract role",
+    "part-time role",
+    "part time role",
+    "freelance",
+    "contractor",
+    "external tester",
+    "community tester",
+    "test lab",
+    "QA contributor",
+    "stress test",
+    "stress tester",
+    "bug tester",
+    "red team",
+    "chaos testing",
+    "alphanet",
+    "pre-testnet",
+    "incentivized testnet",
+    "testnet incentive",
+    "bounty",
+    "grant",
+    "RFP",
+    "request for proposal",
+    "stipend",
+    "retainer",
+    "USDT",
+    "USDC",
+    "per month",
+    "monthly",
+    "deliverables",
+    "scope of work",
+    "qualifications",
+    "responsibilities",
+    "years of experience",
+    "send your CV",
+    "we'll pay",
+    "we will pay",
+    "will be paid",
+    "applicants",
+    "candidates",
+    "paid"
+  ],
   "discussion_search": [
     "testnet QA hiring",
     "paid testing contract testnet",
+    "QA engineer blockchain hiring",
     "community devnet testing",
-    "external tester program"
+    "node operator paid contract",
+    "validator testing paid",
+    "test lab proposal",
+    "external tester program",
+    "bounty node operator",
+    "grant testnet validator",
+    "looking for testers devnet",
+    "QA contributor crypto",
+    "paid contributor testnet",
+    "seeking node operators",
+    "test coordinator devnet",
+    "infrastructure contributor grant",
+    "validator onboarding rewards",
+    "devnet feedback rewards",
+    "independent operator wanted",
+    "testnet campaign rewards"
   ],
-
-  "github_search": [
-    { "type": "issues",       "query": "\"QA engineer\" blockchain in:title state:open is:issue" },
-    { "type": "repositories", "query": "testnet QA hiring in:name,description" }
+  "project_max_stars": 500,
+  "project_keywords": [
+    "testnet",
+    "devnet",
+    "alphanet",
+    "validator",
+    "node operator",
+    "run a node",
+    "node setup",
+    "incentiv",
+    "points program",
+    "airdrop",
+    "mainnet launch",
+    "operator program",
+    "node software",
+    "prover",
+    "miner",
+    "sequencer",
+    "rollup",
+    "join the network"
   ],
-
   "project_search": [
+    "incentivized testnet program",
     "run a validator node testnet",
     "node operator onboarding",
+    "devnet launch participants",
     "early node operators wanted",
-    "devnet launch participants"
+    "testnet rewards points",
+    "prover network participation",
+    "join our testnet"
   ],
-
-  "project_keywords": [
-    "testnet", "devnet", "alphanet", "validator", "node operator",
-    "run a node", "node setup", "incentiv", "points program", "airdrop",
-    "mainnet launch", "node software", "prover", "sequencer", "rollup"
-  ],
-
   "project_orgs_only": true,
-  "project_max_stars": 500,
-  "project_max_per_repo": 1,
   "project_exclude_orgs": [
-    "ethereum-optimism", "filecoin-project", "ethereumclassic",
-    "farcasterxyz", "iotaledger", "canton-network", "ethereum",
-    "near", "solana-labs", "cosmos", "akash-network", "microsoft"
-  ]
+    "ethereum-optimism",
+    "filecoin-project",
+    "ethereumclassic",
+    "farcasterxyz",
+    "farcasterorg",
+    "iotaledger",
+    "canton-network",
+    "ethereum",
+    "near",
+    "solana-labs",
+    "cosmos",
+    "akash-network",
+    "chainsafe",
+    "paritytech",
+    "aptos-labs",
+    "near-one",
+    "microsoft",
+    "community",
+    "vercel",
+    "oppia",
+    "langchain-ai"
+  ],
+  "forum_keywords": [
+    "[rfp]",
+    "rfp:",
+    "request for proposal",
+    "service provider",
+    "applications are open",
+    "applications open",
+    "now accepting",
+    "call for",
+    "seeking a",
+    "seeking an",
+    "looking to hire",
+    "scope of work",
+    "statement of work",
+    "external audit",
+    "audit provider",
+    "testing provider",
+    "qa provider",
+    "engage a",
+    "engagement proposal",
+    "vendor",
+    "contractor"
+  ],
+  "forums": [
+    {
+      "name": "Arbitrum",
+      "host": "https://forum.arbitrum.foundation"
+    },
+    {
+      "name": "Optimism",
+      "host": "https://gov.optimism.io"
+    },
+    {
+      "name": "Aave",
+      "host": "https://governance.aave.com"
+    },
+    {
+      "name": "Lido",
+      "host": "https://research.lido.fi"
+    },
+    {
+      "name": "Cosmos",
+      "host": "https://forum.cosmos.network"
+    },
+    {
+      "name": "Polkadot",
+      "host": "https://forum.polkadot.network"
+    },
+    {
+      "name": "Uniswap",
+      "host": "https://gov.uniswap.org"
+    },
+    {
+      "name": "MakerDAO",
+      "host": "https://forum.sky.money"
+    },
+    {
+      "name": "Osmosis",
+      "host": "https://forum.osmosis.zone"
+    },
+    {
+      "name": "Celestia",
+      "host": "https://forum.celestia.org"
+    },
+    {
+      "name": "Berachain",
+      "host": "https://forum.berachain.com"
+    },
+    {
+      "name": "dYdX",
+      "host": "https://dydx.forum"
+    },
+    {
+      "name": "Gnosis",
+      "host": "https://forum.gnosis.io"
+    },
+    {
+      "name": "Radworks",
+      "host": "https://community.radworks.org"
+    },
+    {
+      "name": "Gitcoin",
+      "host": "https://gov.gitcoin.co"
+    },
+    {
+      "name": "NEAR",
+      "host": "https://gov.near.org"
+    }
+  ],
+  "forum_tech_keywords": [
+    "test",
+    "testing",
+    "qa",
+    "quality",
+    "audit",
+    "security",
+    "infrastructure",
+    "node",
+    "validator",
+    "engineering",
+    "devops",
+    "monitoring",
+    "devnet",
+    "testnet",
+    "technical",
+    "automation",
+    "tooling",
+    "integration"
+  ],
+  "hackathons": {
+    "enabled": true,
+    "min_prize": 5000,
+    "online_only": true,
+    "queries": [
+      "agent",
+      "ai agent",
+      "crypto",
+      "blockchain",
+      "web3",
+      "infrastructure"
+    ],
+    "keywords": [
+      "agent",
+      "agentic",
+      "autonomous",
+      "llm",
+      "ai",
+      "machine learning",
+      "crypto",
+      "blockchain",
+      "web3",
+      "onchain",
+      "on-chain",
+      "protocol",
+      "node",
+      "validator",
+      "decentralized",
+      "infrastructure",
+      "backend",
+      "api",
+      "data",
+      "open ended",
+      "productivity"
+    ]
+  }
 }

@@ -39,6 +39,17 @@ no RSS feed, so this needs a token.
 part that finds projects you have never heard of, and it is the single
 most useful source in the script.
 
+**Governance forums.** Discourse instances publish a JSON endpoint for
+their latest topics. Protocols often announce paid testing programmes and
+operator grants there before they announce them anywhere else.
+
+**Hackathons.** Devpost has a public JSON API covering roughly 14,000
+competitions. Almost all of them are student events or corporate API
+contests, so this source is filtered hard: open only, online only, at
+least one cash prize, a minimum prize floor, and a keyword match against
+what you actually build. It exists because a hackathon is paid work with
+a deadline, and none of the other sources index one.
+
 ## Two nets, one channel
 
 Alerts are tagged so you can tell them apart at a glance:
