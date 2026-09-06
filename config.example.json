@@ -1,5 +1,4 @@
 {
-  "_comment": "Copy to config.json and edit. config.json is gitignored.",
   "discord_webhook": "https://discord.com/api/webhooks/YOUR/WEBHOOK",
   "max_alerts_per_run": 8,
   "role_keywords": [
@@ -16,8 +15,6 @@
     "hiring",
     "job posting",
     "open role",
-    "quantachain",
-    "katenet",
     "sre",
     "site reliability",
     "protocol engineer",
@@ -163,9 +160,6 @@
     },
     {
       "repo": "3jane-protocol/whitepaper"
-    },
-    {
-      "repo": "quantachain/quanta"
     }
   ],
   "body_keywords": [
