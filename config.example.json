@@ -525,5 +525,18 @@
       "openhack"
     ]
   },
-  "discussion_block_title": "^proposal #\\d+|\u2014 m\\d+ report|monthly report no|governance proposal"
+  "discussion_block_title": "^proposal #\\d+|\u2014 m\\d+ report|monthly report no|governance proposal",
+  "sniper": {
+    "enabled": true,
+    "url": "https://qnievbxyqiwkxpuqfjkp.supabase.co/rest/v1/rpc/list_sniper_projects",
+    "apikey": "YOUR_SUPABASE_ANON_KEY",
+    "created_after": "2026-03-01",
+    "min_followers": 200,
+    "max_followers": 5000,
+    "pages": 5,
+    "page_size": 250,
+    "require_website": true,
+    "want": "node|validator|testnet|devnet|infrastructur|compute|gpu|depin|operator|layer-1|l1|network",
+    "block": "perp|leverage|launchpad|meme|tcg|casino|bet|prediction|nft|swap|dex|stablecoin|quantum computer|igaming"
+  }
 }

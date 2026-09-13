@@ -47,11 +47,13 @@ def log(msg):
         pass
 
 
-def fetch(url, headers=None):
+def fetch(url, headers=None, data=None):
     h = {"User-Agent": UA}
     if headers:
         h.update(headers)
-    req = urllib.request.Request(url, headers=h)
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    req = urllib.request.Request(url, headers=h, data=data)
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             return resp.read().decode("utf-8", errors="replace")
@@ -669,6 +671,77 @@ def check_hackathons(config, seen):
             })
     return hits
 
+def check_sniper(config, seen):
+    """wwshemi Sniper board via its public Supabase endpoint. Early-stage
+    crypto projects found by X account. Pre-token discovery, not jobs."""
+    cfg = config.get("sniper", {})
+    if not cfg.get("enabled"):
+        return []
+
+    key = cfg.get("apikey", "")
+    hdr = {"apikey": key, "authorization": "Bearer " + key,
+           "content-type": "application/json"}
+    want = re.compile(cfg.get("want", r"$^"), re.I)
+    block = re.compile(cfg.get("block", r"$^"), re.I)
+    lo = cfg.get("min_followers", 200)
+    hi = cfg.get("max_followers", 5000)
+    size = cfg.get("page_size", 250)
+
+    rows = []
+    for page in range(cfg.get("pages", 5)):
+        body = json.dumps({
+            "_sort_by": "score", "_sort_direction": "desc",
+            "_created_after": cfg.get("created_after"),
+            "_limit": size, "_offset": page * size,
+            "_activity_months": 0, "_show_unavailable": False,
+        })
+        raw = fetch(cfg.get("url", ""), headers=hdr, data=body)
+        if raw is None:
+            break
+        try:
+            batch = json.loads(raw)
+        except Exception:
+            log("  ! sniper: bad json")
+            break
+        if not isinstance(batch, list) or not batch:
+            break
+        rows += [r.get("project", {}) for r in batch]
+        if len(batch) < size:
+            break
+
+    hits, kept = [], 0
+    for p in rows:
+        pid = p.get("id")
+        if not pid:
+            continue
+        k = f"sniper:{pid}"
+        if k in seen:
+            continue
+        seen[k] = int(time.time())
+
+        f = p.get("followers_count") or 0
+        if f < lo or f > hi:
+            continue
+        if cfg.get("require_website") and not p.get("website_url"):
+            continue
+        bio = str(p.get("bio") or "")
+        if block.search(bio) or not want.search(bio):
+            continue
+
+        kept += 1
+        hits.append({
+            "source": "sniper",
+            "label": "PROJECT",
+            "title": f"{p.get('twitter_username')} ({f} followers, X {str(p.get('twitter_created_at'))[:7]}, {p.get('category')})",
+            "detail": p.get("website_url") or "",
+            "url": f"https://x.com/{p.get('twitter_username')}",
+            "matched": bio[:160].replace("\n", " "),
+        })
+
+    log(f"  - sniper: {len(rows)} scanned, {kept} kept")
+    return hits
+
+
 def check_hackodds(config, seen):
     """HackOdds aggregator. Covers devpost, dorahacks, devfolio, hacklist,
     hackquest and openhack in one JSON feed."""
@@ -909,6 +982,8 @@ def main():
     hits += check_aijobs(config, seen)
     log(" hackodds")
     hits += check_hackodds(config, seen)
+    log(" sniper")
+    hits += check_sniper(config, seen)
 
     seen = prune_seen(seen)
     save_json_file(SEEN_PATH, seen)
