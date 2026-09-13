@@ -419,7 +419,12 @@ def check_github_discussions(config, narrow, seen, token):
             key = f"ghd:{url}"
             if key in seen:
                 continue
-            hit = narrow(n.get("title", ""))
+            _t = n.get("title", "")
+            _blk = config.get("discussion_block_title", "")
+            if _blk and re.search(_blk, _t, re.I):
+                seen[key] = int(time.time())
+                continue
+            hit = narrow(_t)
             if not hit:
                 body = (n.get("body") or "")[:4000].lower()
                 for w in config.get("body_keywords", []):
@@ -664,6 +669,131 @@ def check_hackathons(config, seen):
             })
     return hits
 
+def check_hackodds(config, seen):
+    """HackOdds aggregator. Covers devpost, dorahacks, devfolio, hacklist,
+    hackquest and openhack in one JSON feed."""
+    cfg = config.get("hackodds", {})
+    if not cfg.get("enabled"):
+        return []
+
+    min_prize = cfg.get("min_prize", 3000)
+    max_reg = cfg.get("max_registrations", 4000)
+    kw = [k.lower() for k in cfg.get("keywords", [])]
+    block = re.compile(cfg.get("block", r"$^"), re.I)
+
+    raw = fetch(cfg.get("url", ""))
+    if raw is None:
+        return []
+    try:
+        items = json.loads(raw).get("hackathons", [])
+    except Exception:
+        log("  ! hackodds: bad json")
+        return []
+
+    hits, kept = [], 0
+    for h in items:
+        hid = h.get("id") or h.get("sourceId")
+        key = f"hackodds:{hid}"
+        if key in seen:
+            continue
+        seen[key] = int(time.time())
+
+        if not h.get("online"):
+            continue
+        prize = h.get("prizeUsd") or 0
+        if prize < min_prize:
+            continue
+        reg = h.get("registrations")
+        if reg is not None and reg > max_reg:
+            continue
+
+        title = h.get("title") or ""
+        themes = " ".join(h.get("themes") or [])
+        blob = f"{title} {themes}".lower()
+        if block.search(blob):
+            continue
+        matched = next((k for k in kw if k in blob), None)
+        if kw and not matched:
+            continue
+
+        kept += 1
+        ratio = f"1 in {int(reg/1):,}" if reg else "no reg count"
+        hits.append({
+            "source": f"hackodds ({h.get('source')})",
+            "title": title[:110],
+            "detail": (f"${prize:,} · {reg if reg is not None else '?'} registered"
+                       f" · {h.get('organization') or ''}"
+                       f" · {themes[:60]}"),
+            "url": h.get("url") or "",
+            "matched": matched or "online",
+            "label": "HACKATHON",
+        })
+    log(f"  - hackodds: {len(items)} scanned, {kept} kept")
+    return hits
+
+def check_aijobs(config, seen):
+    """artificialintelligencejobs.co RSS. Filters out roles gated on
+    seniority or a degree, keeps the ones actually open to us."""
+    cfg = config.get("aijobs", {})
+    if not cfg.get("enabled"):
+        return []
+
+    block_title = re.compile(cfg.get("block_title", r"$^"), re.I)
+    block_loc = re.compile(cfg.get("block_loc", r"$^"), re.I)
+    want_title = re.compile(cfg.get("want_title", r".*"), re.I)
+    want_loc = re.compile(cfg.get("want_loc", r".*"), re.I)
+
+    hits = []
+    for url in cfg.get("feeds", []):
+        raw = fetch(url)
+        if raw is None:
+            continue
+
+        items = re.findall(r"<item>(.*?)</item>", raw, re.S)
+        if not items:
+            log(f"  - aijobs {url.rsplit('/',1)[-1]}: no items parsed")
+            continue
+
+        kept = 0
+        for it in items:
+            def tag(t):
+                m = re.search(rf"<{t}>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</{t}>", it, re.S)
+                return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
+
+            title = tag("title")
+            link = tag("link")
+            desc = tag("description")
+            if not title or not link:
+                continue
+
+            key = f"aijobs:{link}"
+            if key in seen:
+                continue
+            seen[key] = int(time.time())
+
+            blob = f"{title} {desc}"
+            if block_title.search(title):
+                continue
+            if block_loc.search(blob):
+                continue
+            if not want_loc.search(blob):
+                continue
+            m = want_title.search(title)
+            if not m:
+                continue
+
+            kept += 1
+            hits.append({
+                "source": "aijobs.co",
+                "title": title[:120],
+                "detail": re.sub(r"<[^>]+>", " ", desc)[:160],
+                "url": link,
+                "matched": m.group(0),
+                "label": "JOB",
+            })
+        log(f"  - aijobs {url.rsplit('/',1)[-1]}: {len(items)} scanned, {kept} kept")
+    return hits
+
 def post_discord(webhook, content):
     payload = json.dumps({"content": content, "flags": 4}).encode("utf-8")
     req = urllib.request.Request(
@@ -773,6 +903,10 @@ def main():
     hits += check_github_search(config, seen, token)
     log(" hackathons")
     hits += check_hackathons(config, seen)
+    log(" aijobs.co")
+    hits += check_aijobs(config, seen)
+    log(" hackodds")
+    hits += check_hackodds(config, seen)
 
     seen = prune_seen(seen)
     save_json_file(SEEN_PATH, seen)

@@ -21,7 +21,24 @@
     "platform engineer",
     "observability",
     "devops",
-    "monitoring"
+    "monitoring",
+    "technical writer",
+    "documentation",
+    "docs engineer",
+    "developer advocate",
+    "developer relations",
+    "devrel",
+    "developer experience",
+    "community manager",
+    "support engineer",
+    "technical support",
+    "solutions engineer",
+    "forward deployed",
+    "technical writing",
+    "evaluation",
+    "evals",
+    "annotation",
+    "data quality"
   ],
   "domain_keywords": [
     "crypto",
@@ -160,6 +177,11 @@
     },
     {
       "repo": "3jane-protocol/whitepaper"
+    },
+    {
+      "repo": "hashkinetics/hashkinetics",
+      "branch": "main",
+      "discussions": true
     }
   ],
   "body_keywords": [
@@ -450,5 +472,55 @@
       "open ended",
       "productivity"
     ]
-  }
+  },
+  "aijobs": {
+    "enabled": true,
+    "feeds": [
+      "https://artificialintelligencejobs.co/feed.xml",
+      "https://cryptocurrencyjobs.co/index.xml"
+    ],
+    "want_title": "technical writer|documentation|docs engineer|developer advocate|developer relations|devrel|developer experience|community|support engineer|technical support|solutions engineer|forward deployed|node operator|validator|infrastructure operations|siteops|technical program|program manager|operations engineer|content engineer|evaluation|evals|annotat|data quality|quality assurance|\\bqa\\b|tester|red team|trust and safety|research assistant|associate|coordinator|specialist",
+    "block_title": "senior|staff|principal|lead |director|head of|vp |chief|manager,|counsel|attorney|legal|paralegal|recruit|talent|sales|account executive|account director|marketing manager|social media|designer|frontend|front-end|mobile|ios|android|accountant|tax|payroll|controller|technician|electrician|mechanic|hardware|silicon|asic|rtl|analog|kernel|compiler|new grad|graduate|intern|investment|risk analyst|market analyst|trader|portfolio|compliance|finance|technical program|program manager|project manager|product manager",
+    "want_loc": "remote|anywhere|global|worldwide|canada|distributed",
+    "block_loc": "hybrid|on-?site|in-?person|must be located in the (us|united states)|us only|united states only|remotely in the us|remote in the us|us residents|must reside in the us|authorized to work in the us|usa only"
+  },
+  "hackodds": {
+    "enabled": true,
+    "url": "https://hackodds-live.vercel.app/api/hackathons",
+    "min_prize": 500,
+    "max_registrations": 4000,
+    "keywords": [
+      "agent",
+      "agentic",
+      "autonomous",
+      "ai",
+      "llm",
+      "machine learning",
+      "crypto",
+      "blockchain",
+      "web3",
+      "onchain",
+      "on-chain",
+      "defi",
+      "protocol",
+      "node",
+      "validator",
+      "testnet",
+      "depin",
+      "decentrali",
+      "infrastructure",
+      "backend",
+      "devops",
+      "api",
+      "data",
+      "trading",
+      "open ended",
+      "productivity",
+      "developer tools",
+      "mcp",
+      "x402"
+    ],
+    "block": "student|university|college|youth|school|hackclub|women only|high school|beginner friendly hardware|game jam|design only|students only|teen|k-12|undergrad"
+  },
+  "discussion_block_title": "^proposal #\\d+|\u2014 m\\d+ report|monthly report no|governance proposal"
 }
