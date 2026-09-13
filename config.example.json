@@ -520,7 +520,10 @@
       "mcp",
       "x402"
     ],
-    "block": "student|university|college|youth|school|hackclub|women only|high school|beginner friendly hardware|game jam|design only|students only|teen|k-12|undergrad"
+    "block": "student|university|college|youth|school|hackclub|women only|high school|beginner friendly hardware|game jam|design only|students only|teen|k-12|undergrad",
+    "block_sources": [
+      "openhack"
+    ]
   },
   "discussion_block_title": "^proposal #\\d+|\u2014 m\\d+ report|monthly report no|governance proposal"
 }

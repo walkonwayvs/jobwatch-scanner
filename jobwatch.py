@@ -698,6 +698,8 @@ def check_hackodds(config, seen):
             continue
         seen[key] = int(time.time())
 
+        if h.get("source") in (cfg.get("block_sources") or []):
+            continue
         if not h.get("online"):
             continue
         prize = h.get("prizeUsd") or 0
