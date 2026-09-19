@@ -849,9 +849,9 @@ def check_aijobs(config, seen):
             blob = f"{title} {desc}"
             if block_title.search(title):
                 continue
-            if block_loc.search(blob):
+            if block_loc.search(desc):
                 continue
-            if not want_loc.search(blob):
+            if not want_loc.search(desc):
                 continue
             m = want_title.search(title)
             if not m:
