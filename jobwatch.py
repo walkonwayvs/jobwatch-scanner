@@ -778,7 +778,7 @@ def check_hackodds(config, seen):
         prize = h.get("prizeUsd") or 0
         if prize < min_prize:
             continue
-        reg = h.get("registrations")
+        reg = h.get("registrations") or None
         if reg is not None and reg > max_reg:
             continue
 
@@ -790,6 +790,11 @@ def check_hackodds(config, seen):
         matched = next((k for k in kw if k in blob), None)
         if kw and not matched:
             continue
+
+        ukey = f"hackodds-url:{h.get('url')}"
+        if ukey in seen:
+            continue
+        seen[ukey] = int(time.time())
 
         kept += 1
         ratio = f"1 in {int(reg/1):,}" if reg else "no reg count"
