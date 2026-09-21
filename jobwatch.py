@@ -1010,6 +1010,7 @@ def main():
 
     total = len(hits)
     overflow = total - cap
+    rest = hits[cap:]
     hits = hits[:cap]
     log(f"{total} new match(es), sending {len(hits)}")
 
@@ -1022,11 +1023,22 @@ def main():
             time.sleep(1)
 
     if overflow > 0:
-        note = f"...and {overflow} more matches this run (capped)."
-        if dry or not webhook:
-            print("\n" + note)
-        else:
-            post_discord(webhook, note)
+        lines = [f"...and {overflow} more this run:"]
+        lines += [f"\u2022 {h['title']} {h['url']}" for h in rest]
+        chunks, cur = [], ""
+        for ln in lines:
+            if len(cur) + len(ln) + 1 > 1900:
+                chunks.append(cur)
+                cur = ""
+            cur += ln + "\n"
+        if cur:
+            chunks.append(cur)
+        for note in chunks:
+            if dry or not webhook:
+                print("\n" + note)
+            else:
+                post_discord(webhook, note)
+                time.sleep(1)
     return 0
 
 
