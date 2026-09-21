@@ -482,7 +482,7 @@
     "want_title": "technical writer|documentation|docs engineer|developer advocate|developer relations|devrel|developer experience|community|support engineer|technical support|solutions engineer|forward deployed|node operator|validator|infrastructure operations|siteops|technical program|program manager|operations engineer|content engineer|evaluation|evals|annotat|data quality|quality assurance|\\bqa\\b|tester|red team|trust and safety|research assistant|associate|coordinator|specialist",
     "block_title": "senior|staff|principal|lead |director|head of|vp |chief|manager,|counsel|attorney|legal|paralegal|recruit|talent|sales|account executive|account director|marketing manager|social media|designer|frontend|front-end|mobile|ios|android|accountant|tax|payroll|controller|technician|electrician|mechanic|hardware|silicon|asic|rtl|analog|kernel|compiler|new grad|graduate|intern|investment|risk analyst|market analyst|trader|portfolio|compliance|finance|technical program|program manager|project manager|product manager",
     "want_loc": "remote|anywhere|global|worldwide|canada|distributed",
-    "block_loc": "hybrid|on-?site|in-?person|must be located in the (us|united states)|us only|united states only|remotely in the us|remote in the us|us residents|must reside in the us|authorized to work in the us|usa only"
+    "block_loc": "hybrid|on-?site|in-?person|must be located in the (us|united states)|us only|united states only|remotely in the us|remote in the us|us residents|must reside in the us|authorized to work in the us|usa only|travel-required"
   },
   "hackodds": {
     "enabled": true,
