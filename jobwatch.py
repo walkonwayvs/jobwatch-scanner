@@ -192,8 +192,11 @@ def check_named_boards(config, narrow, seen):
                 continue
             hit = narrow(title)
             if hit:
-                hits.append({"source": name, "title": title,
-                             "detail": loc, "url": link, "matched": hit})
+                tkey = f"board-title:{name}:{title.strip().lower()}"
+                if tkey not in seen:
+                    hits.append({"source": name, "title": title,
+                                 "detail": loc, "url": link, "matched": hit})
+                    seen[tkey] = int(time.time())
             seen[key] = int(time.time())
         log(f"  - {name}: {len(posts)} scanned")
     return hits
