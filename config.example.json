@@ -476,7 +476,6 @@
   "aijobs": {
     "enabled": true,
     "feeds": [
-      "https://artificialintelligencejobs.co/feed.xml",
       "https://cryptocurrencyjobs.co/index.xml"
     ],
     "want_title": "technical writer|documentation|docs engineer|developer advocate|developer relations|devrel|developer experience|community|support engineer|technical support|solutions engineer|forward deployed|node operator|validator|infrastructure operations|siteops|technical program|program manager|operations engineer|content engineer|evaluation|evals|annotat|data quality|quality assurance|\\bqa\\b|tester|red team|trust and safety|research assistant|associate|coordinator|specialist",
@@ -520,7 +519,7 @@
       "mcp",
       "x402"
     ],
-    "block": "student|university|college|youth|school|hackclub|women only|high school|beginner friendly hardware|game jam|design only|students only|teen|k-12|undergrad",
+    "block": "student|university|college|youth|school|hackclub|women only|high school|beginner friendly|game jam|design only|students only|teen|k-12|undergrad",
     "block_sources": [
       "openhack"
     ]
