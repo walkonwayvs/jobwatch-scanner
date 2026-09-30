@@ -661,6 +661,11 @@ def check_hackathons(config, seen):
                 continue
 
             seen[key] = int(time.time())
+            skey = hack_url_key(h.get("url", ""))
+            if skey and skey in seen:
+                continue
+            if skey:
+                seen[skey] = int(time.time())
             hits.append({
                 "source": f"devpost ({h.get('organization_name','')})",
                 "title": title,
@@ -673,6 +678,13 @@ def check_hackathons(config, seen):
                 "label": "HACKATHON",
             })
     return hits
+
+def hack_url_key(u):
+    """Shared key so Devpost and hackodds don't both alert on one event."""
+    u = (u or "").split("#")[0].split("?")[0].strip().rstrip("/").lower()
+    u = re.sub(r"^https?://(www\.)?", "", u)
+    return f"hack-url:{u}" if u else None
+
 
 def check_sniper(config, seen):
     """wwshemi Sniper board via its public Supabase endpoint. Early-stage
@@ -795,9 +807,12 @@ def check_hackodds(config, seen):
             continue
 
         ukey = f"hackodds-url:{h.get('url')}"
-        if ukey in seen:
+        skey = hack_url_key(h.get("url"))
+        if ukey in seen or (skey and skey in seen):
             continue
         seen[ukey] = int(time.time())
+        if skey:
+            seen[skey] = int(time.time())
 
         kept += 1
         ratio = f"1 in {int(reg/1):,}" if reg else "no reg count"
