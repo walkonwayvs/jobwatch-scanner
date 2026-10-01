@@ -616,6 +616,7 @@ def check_hackathons(config, seen):
     if not cfg.get("enabled"):
         return []
     min_prize = cfg.get("min_prize", 5000)
+    block = re.compile(cfg.get("block") or config.get("hackodds", {}).get("block") or r"$^", re.I)
     kw = [k.lower() for k in cfg.get("keywords", [])]
     hits = []
     for term in cfg.get("queries", []):
@@ -656,6 +657,8 @@ def check_hackathons(config, seen):
             title = h.get("title", "")
             themes = " ".join(t.get("name", "") for t in h.get("themes", []))
             blob = f"{title} {themes}".lower()
+            if block.search(blob):
+                continue
             matched = next((k for k in kw if k in blob), None)
             if kw and not matched:
                 continue
