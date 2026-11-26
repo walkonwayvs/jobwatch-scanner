@@ -895,6 +895,20 @@ def check_aijobs(config, seen):
         log(f"  - aijobs {url.rsplit('/',1)[-1]}: {len(items)} scanned, {kept} kept")
     return hits
 
+def drop_blocked(config, hits):
+    """Drop anything mentioning a dead project, from every source."""
+    words = [w.lower() for w in config.get("block_anywhere", [])]
+    if not words:
+        return hits
+    out = []
+    for h in hits:
+        blob = " ".join(str(h.get(k, "")) for k in ("title", "source", "detail", "url")).lower()
+        if any(w in blob for w in words):
+            continue
+        out.append(h)
+    return out
+
+
 def post_discord(webhook, content):
     payload = json.dumps({"content": content, "flags": 4}).encode("utf-8")
     req = urllib.request.Request(
@@ -1010,6 +1024,8 @@ def main():
     hits += check_hackodds(config, seen)
     log(" sniper")
     hits += check_sniper(config, seen)
+
+    hits = drop_blocked(config, hits)
 
     seen = prune_seen(seen)
     save_json_file(SEEN_PATH, seen)

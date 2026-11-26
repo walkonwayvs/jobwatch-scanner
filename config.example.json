@@ -124,12 +124,6 @@
   ],
   "github_repos": [
     {
-      "repo": "gonka-ai/gonka"
-    },
-    {
-      "repo": "paranjko/external-test-lab"
-    },
-    {
       "repo": "genlayerlabs/skills"
     },
     {
@@ -144,9 +138,6 @@
     {
       "repo": "geobrowser/geogenesis",
       "branch": "master"
-    },
-    {
-      "repo": "IncentivNetwork/incentum-pow"
     },
     {
       "repo": "Fortytwo-Network/fortytwo-node-skills"
@@ -537,5 +528,11 @@
     "require_website": true,
     "want": "node|validator|testnet|devnet|infrastructur|compute|gpu|depin|operator|layer-1|l1|network",
     "block": "perp|leverage|launchpad|meme|tcg|casino|bet|prediction|nft|swap|dex|stablecoin|quantum computer|igaming"
-  }
+  },
+  "block_anywhere": [
+    "gonka",
+    "paranjko",
+    "incentivnetwork",
+    "incentum"
+  ]
 }
