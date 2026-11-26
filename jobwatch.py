@@ -53,11 +53,11 @@ def fetch(url, headers=None, data=None):
         h.update(headers)
     if isinstance(data, str):
         data = data.encode("utf-8")
-    req = urllib.request.Request(url, headers=h, data=data)
     try:
+        req = urllib.request.Request(url, headers=h, data=data)
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             return resp.read().decode("utf-8", errors="replace")
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
+    except Exception as e:
         log(f"  ! could not reach {url.split('?')[0]} ({e})")
         return None
 
