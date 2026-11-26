@@ -69,9 +69,12 @@ to describe yourself.
 
 Alerts are tagged so you can tell them apart at a glance:
 
-- `[JOB]` — a paid role or contract
-- `[PROJECT]` — an early network worth investigating
-- `[STATUS]` — weekly "still alive" note, so silence is never ambiguous
+- `[JOB]`: a paid role or contract
+- `[JOB · US-only?]`: a paid role that looks limited to the US
+- `[PROJECT]`: an early network worth investigating
+- `[INFRA]`: a matching commit or release on a watched repo
+- `[HACKATHON]`: a hackathon that passed the AI check
+- `[STATUS]`: weekly "still alive" note, so silence is never ambiguous
 
 The two nets use separate keyword lists and separate filters. A job alert
 and a project alert are looking for completely different things.
@@ -96,6 +99,20 @@ identify big projects reliably, because large chains post governance
 discussions in side repos with low star counts. There is no clean
 programmatic signal for "already too well known." A hand-maintained list
 is blunt, and it is what works.
+
+**Discussions have to be recent and say they're hiring.** Sorting by
+last update kept resurfacing months-old threads, and keyword hits buried
+in the body were almost always noise. A discussion now has to be newer
+than `discussion_max_age_days`, and its title has to match
+`discussion_title_must`: hiring, contractor, bounty, paid testers and so
+on.
+
+**US-only jobs are tagged, not dropped.** Some are still worth applying
+to as a contractor, so the reader decides.
+
+**A block list that applies everywhere.** `block_anywhere` drops any
+alert from any source whose title, source or link mentions a project you
+are done with. Easier than chasing it through every keyword list.
 
 **A cap on alerts per run**, so a badly chosen keyword annoys you eight
 times rather than eighty.
@@ -143,6 +160,17 @@ programme, a live testnet and a wallet-integration pull request open
 against a major hardware wallet — whose proposals repo had zero stars.
 Star count punishes exactly the thing being searched for. Account type
 turned out to be the better signal.
+
+**Mining phrases on repo search.** Searching new repositories for
+"proof of work", "fair launch" or "GPU miner" returned almost nothing but
+student security projects. The same phrases work on Discussions, where
+new proof-of-work coins actually talk to their miners.
+
+**Trusting a feed's links.** One hackathon aggregator entry had the
+literal text `PASTE_CONTEST_URL_HERE` as its URL. Building the request
+raised an error outside the network try block and crashed the run before
+anything was saved. Every fetch error is now caught, and entries without
+a real link are skipped.
 
 ## Setup
 
