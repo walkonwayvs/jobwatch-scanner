@@ -50,6 +50,21 @@ least one cash prize, a minimum prize floor, and a keyword match against
 what you actually build. It exists because a hackathon is paid work with
 a deadline, and none of the other sources index one.
 
+Keyword filters were not enough. Roughly 60 hackathons a month got
+through and almost none were winnable: identity checks, students only,
+one country only, prizes paid in credits, or generic AI app contests with
+hundreds of entrants. So every new hackathon now goes to an LLM along
+with its listing and whatever text its page serves. It has to pass a set
+of hard rules and score at least `min_fit` out of 10 for how well it suits
+what you build. At most `per_day` post, best first. Most days that is
+zero, which is the point.
+
+The check uses FLOP inference first if `flop.key` and `flop.model` exist,
+and DeepSeek otherwise. If the call fails, those hackathons are left
+unseen and retried on the next run rather than lost. The rules and the
+description of who it is screening for live in `HACK_PROMPT`; change them
+to describe yourself.
+
 ## Two nets, one channel
 
 Alerts are tagged so you can tell them apart at a glance:
@@ -148,6 +163,18 @@ echo "ghp_your_token_here" > token.txt
 chmod 600 token.txt
 ```
 
+For the hackathon check, add an API key. DeepSeek is the fallback and
+FLOP is tried first when present:
+
+```bash
+echo "sk-your_deepseek_key" > deepseek.key
+chmod 600 deepseek.key
+```
+
+Without a key the check fails safely: hackathons are held back and
+retried each run, and nothing else is affected. Set `hack_judge.enabled`
+to `false` to post them unscreened instead.
+
 Check the wiring, then do a first run:
 
 ```bash
@@ -188,6 +215,9 @@ better source anyway.
 | `config.example.json` | Template — copy to `config.json`     |
 | `seen.json`           | What you have already been told      |
 | `token.txt`           | GitHub token (gitignored)            |
+| `deepseek.key`        | LLM key for the hackathon check      |
+| `flop.key`, `flop.model` | Optional FLOP inference key and model |
+| `hack_budget.json`    | How many hackathons posted today     |
 | `jobwatch.log`        | Run history, rotates at 2 MB         |
 
 `config.json`, `token.txt` and all state files are gitignored. Do not
