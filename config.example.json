@@ -283,7 +283,14 @@
     "miner",
     "sequencer",
     "rollup",
-    "join the network"
+    "join the network",
+    "mining",
+    "mineable",
+    "fair launch",
+    "proof of work",
+    "proof-of-work",
+    "premine",
+    "mining pool"
   ],
   "project_search": [
     "incentivized testnet program",
@@ -293,7 +300,13 @@
     "early node operators wanted",
     "testnet rewards points",
     "prover network participation",
-    "join our testnet"
+    "join our testnet",
+    "fair launch mining",
+    "no premine",
+    "mining pool launch",
+    "proof of work testnet",
+    "GPU mining testnet",
+    "CPU mining mainnet"
   ],
   "project_orgs_only": true,
   "project_exclude_orgs": [
