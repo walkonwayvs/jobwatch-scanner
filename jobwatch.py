@@ -16,6 +16,7 @@ Usage:
 """
 
 import datetime
+import html
 import json
 import os
 import re
@@ -31,6 +32,7 @@ CONFIG_PATH = os.path.join(HERE, "config.json")
 SEEN_PATH = os.path.join(HERE, "seen.json")
 TOKEN_PATH = os.path.join(HERE, "token.txt")
 LOG_PATH = os.path.join(HERE, "jobwatch.log")
+HACK_BUDGET_PATH = os.path.join(HERE, "hack_budget.json")
 
 TIMEOUT = 25
 UA = "jobwatch/2.0 (personal job alert script)"
@@ -708,6 +710,8 @@ def check_hackathons(config, seen):
                 "url": h.get("url", ""),
                 "matched": matched or term,
                 "label": "HACKATHON",
+                "keys": [key, skey] if skey else [key],
+                "raw": "",
             })
     return hits
 
@@ -820,6 +824,8 @@ def check_hackodds(config, seen):
 
         if h.get("source") in (cfg.get("block_sources") or []):
             continue
+        if not str(h.get("url") or "").startswith("http"):
+            continue  # placeholder or missing link
         if not h.get("online"):
             continue
         prize = h.get("prizeUsd") or 0
@@ -857,6 +863,9 @@ def check_hackodds(config, seen):
             "url": h.get("url") or "",
             "matched": matched or "online",
             "label": "HACKATHON",
+            "keys": [key, ukey] + ([skey] if skey else []),
+            "raw": json.dumps({k: v for k, v in h.items()
+                               if k not in ("description", "image", "thumbnail")})[:900],
         })
     log(f"  - hackodds: {len(items)} scanned, {kept} kept")
     return hits
@@ -937,6 +946,146 @@ def drop_blocked(config, hits):
             continue
         out.append(h)
     return out
+
+
+def read_key(name):
+    try:
+        with open(os.path.join(HERE, name)) as f:
+            return f.read().strip() or None
+    except OSError:
+        return None
+
+
+def llm_json(prompt):
+    """FLOP first when flop.key and flop.model exist, otherwise DeepSeek.
+    Returns a parsed JSON list or raises."""
+    def ask(url, model, key):
+        body = json.dumps({"model": model, "temperature": 0,
+                           "messages": [{"role": "user", "content": prompt}]}).encode()
+        req = urllib.request.Request(url, data=body, headers={
+            "Content-Type": "application/json", "User-Agent": UA,
+            "Authorization": "Bearer " + key})
+        with urllib.request.urlopen(req, timeout=180) as r:
+            txt = json.loads(r.read().decode("utf-8", "replace"))["choices"][0]["message"]["content"]
+        out = json.loads(txt[txt.find("["): txt.rfind("]") + 1])
+        if not isinstance(out, list):
+            raise ValueError("not a list")
+        return out
+    fk, fm = read_key("flop.key"), read_key("flop.model")
+    if fk and fm:
+        try:
+            out = ask("https://gateway.testnet.flop.network/v1/chat/completions", fm, fk)
+            log("  hackathon check via FLOP")
+            return out
+        except Exception as e:
+            log(f"  ! FLOP failed, using DeepSeek ({e})")
+    dk = read_key("deepseek.key")
+    if not dk:
+        raise RuntimeError("no deepseek.key")
+    return ask("https://api.deepseek.com/chat/completions", "deepseek-flash", dk)
+
+
+def page_text(url, limit=2500):
+    """Readable text of a hackathon page. Empty if it won't load (JS-only sites)."""
+    raw = fetch(url) if str(url or "").startswith("http") else None
+    if not raw:
+        return ""
+    raw = re.sub(r"(?is)<(script|style|noscript|svg)[^>]*>.*?</\1>", " ", raw)
+    txt = html.unescape(re.sub(r"<[^>]+>", " ", raw))
+    return " ".join(txt.split())[:limit]
+
+
+HACK_PROMPT = """You screen hackathons for one person: a solo crypto infrastructure operator in Canada.
+He runs validators and nodes, writes Python and Bash tooling, builds small on-chain AI agents,
+and does security and verification reviews. He will not do KYC or identity verification, is not
+a student, works alone, and only wants contests he could realistically win. Today is TODAY.
+
+For each numbered hackathon return a JSON array of objects
+{"i": number, "pass": true or false, "fit": 0 to 10, "why": "under 15 words"}.
+
+pass is false if ANY of these is stated or clear: in-person only; solo entries not allowed;
+limited to students, teens, university, women or another group he is not in; limited to a
+country or region that does not include Canada; KYC, ID or passport verification needed to
+enter or get paid (needing an account on an exchange such as Binance, Coinbase, OKX,
+Bybit, Bitget or Kraken, or trading tokenized stocks, counts as KYC); prizes are only credits, merch, swag or other non-cash; submissions close
+in fewer than MINDAYS days or already closed; it needs an existing product with real users or
+traction. If something is not stated, do not fail it for that.
+
+fit is how well it suits his edge: 9-10 = node, validator or infrastructure operations, chain
+security testing, verification or audit tooling, on-chain agents that handle real funds or
+protocols; 6-8 = crypto or web3 builds where a solo backend developer has a fair shot;
+0-5 = generic AI apps, consumer apps, design, ML model training, games, or huge crowded contests.
+
+why gives the main reason, plus the prize and deadline if known. Return only the JSON array.
+
+"""
+
+
+def judge_hackathons(config, hits, seen, dry, first_run):
+    """Run every new hackathon past the AI check. Only passes with a high
+    enough fit are posted, best first, capped per day."""
+    cfg = config.get("hack_judge", {})
+    hacks = [h for h in hits if h.get("label") == "HACKATHON"]
+    others = [h for h in hits if h.get("label") != "HACKATHON"]
+    if not hacks or first_run or not cfg.get("enabled", True):
+        return others + hacks
+    batch_max = int(cfg.get("batch_max", 25))
+    for h in hacks[batch_max:]:  # too many at once: leave the rest for next run
+        for k in h.get("keys", []):
+            seen.pop(k, None)
+    hacks = hacks[:batch_max]
+    blocks = []
+    for i, h in enumerate(hacks):
+        blocks.append(f"{i}. {h['title']} | {h['source']} | {h['detail']} | {h['url']}\n"
+                      f"LISTING: {h.get('raw', '')}\nPAGE: {page_text(h['url'])}")
+    prompt = (HACK_PROMPT.replace("TODAY", time.strftime("%Y-%m-%d", time.gmtime()))
+              .replace("MINDAYS", str(cfg.get("min_days_left", 5))) + "\n\n".join(blocks))
+    try:
+        arr = llm_json(prompt)
+    except Exception as e:
+        log(f"  ! hackathon check failed, retrying these next run ({e})")
+        for h in hacks:
+            for k in h.get("keys", []):
+                seen.pop(k, None)
+        return others
+    verdict = {}
+    for o in arr:
+        try:
+            i = int(o.get("i", -1))
+        except (TypeError, ValueError, AttributeError):
+            continue
+        if 0 <= i < len(hacks):
+            verdict[i] = o
+    min_fit = int(cfg.get("min_fit", 7))
+    keep = []
+    for i, h in enumerate(hacks):
+        o = verdict.get(i)
+        if not o:
+            log(f"  - hackathon not judged, skipped: {h['title'][:60]}")
+            continue
+        try:
+            fit = int(o.get("fit") or 0)
+        except (TypeError, ValueError):
+            fit = 0
+        why = str(o.get("why") or "").strip()
+        passed = o.get("pass") is True or str(o.get("pass")).lower() == "true"
+        if not passed or fit < min_fit:
+            log(f"  - hackathon skipped (fit {fit}): {h['title'][:60]} - {why}")
+            continue
+        h["matched"] = f"fit {fit}/10 - {why}"
+        keep.append((fit, h))
+    keep.sort(key=lambda x: -x[0])
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    budget = load_json_file(HACK_BUDGET_PATH, {})
+    used = budget.get("n", 0) if budget.get("day") == today else 0
+    room = max(0, int(cfg.get("per_day", 3)) - used)
+    out = [h for _, h in keep[:room]]
+    for _, h in keep[room:]:
+        log(f"  - hackathon over daily cap, dropped: {h['title'][:60]}")
+    if out and not dry:
+        save_json_file(HACK_BUDGET_PATH, {"day": today, "n": used + len(out)})
+    log(f"  - hackathon check: {len(hacks)} judged, {len(keep)} passed, {len(out)} posted")
+    return others + out
 
 
 def post_discord(webhook, content):
@@ -1056,6 +1205,8 @@ def main():
     hits += check_sniper(config, seen)
 
     hits = drop_blocked(config, hits)
+    log(" hackathon check")
+    hits = judge_hackathons(config, hits, seen, dry, first_run)
 
     seen = prune_seen(seen)
     save_json_file(SEEN_PATH, seen)

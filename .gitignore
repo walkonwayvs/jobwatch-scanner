@@ -7,3 +7,7 @@ heartbeat.txt
 *.tmp
 __pycache__/
 *.pyc
+hack_budget.json
+deepseek.key
+flop.key
+flop.model

@@ -537,5 +537,12 @@
     "incentum"
   ],
   "discussion_max_age_days": 30,
-  "discussion_title_must": "\\bhiring\\b|\\bhire\\b|\\bwe'?re looking for\\b|\\blooking for (an? )?([\\w-]+ )?(devs?|developers?|engineers?|testers?|operators?|contributors?|validators?|auditors?|writers?)\\b|\\bcontractors?\\b|contract (role|job|position|work)|freelanc|\\bjob (opening|posting|offer)s?\\b|\\bopen (role|position)s?\\b|vacanc|\\bpaid (roles?|positions?|contracts?|work|tasks?|testers?|testing|contributors?|gigs?|opportunit\\w*)\\b|\\bbount(y|ies)\\b|compensat|stipend|\\bgrants\\b|grant program|\\brfp\\b"
+  "discussion_title_must": "\\bhiring\\b|\\bhire\\b|\\bwe'?re looking for\\b|\\blooking for (an? )?([\\w-]+ )?(devs?|developers?|engineers?|testers?|operators?|contributors?|validators?|auditors?|writers?)\\b|\\bcontractors?\\b|contract (role|job|position|work)|freelanc|\\bjob (opening|posting|offer)s?\\b|\\bopen (role|position)s?\\b|vacanc|\\bpaid (roles?|positions?|contracts?|work|tasks?|testers?|testing|contributors?|gigs?|opportunit\\w*)\\b|\\bbount(y|ies)\\b|compensat|stipend|\\bgrants\\b|grant program|\\brfp\\b",
+  "hack_judge": {
+    "enabled": true,
+    "min_fit": 8,
+    "per_day": 3,
+    "min_days_left": 5,
+    "batch_max": 25
+  }
 }
