@@ -195,8 +195,10 @@ def check_named_boards(config, narrow, seen):
             if hit:
                 tkey = f"board-title:{name}:{title.strip().lower()}"
                 if tkey not in seen:
+                    us = re.search(config.get("aijobs", {}).get("us_loc", r"$^"), str(loc or ""))
                     hits.append({"source": name, "title": title,
-                                 "detail": loc, "url": link, "matched": hit})
+                                 "detail": loc, "url": link, "matched": hit,
+                                 "label": "JOB · US-only?" if us else "JOB"})
                     seen[tkey] = int(time.time())
             seen[key] = int(time.time())
         log(f"  - {name}: {len(posts)} scanned")
@@ -870,6 +872,7 @@ def check_aijobs(config, seen):
     block_loc = re.compile(cfg.get("block_loc", r"$^"), re.I)
     want_title = re.compile(cfg.get("want_title", r".*"), re.I)
     want_loc = re.compile(cfg.get("want_loc", r".*"), re.I)
+    us_loc = re.compile(cfg.get("us_loc", r"$^"))  # case-sensitive on purpose: "US" not "us"
 
     hits = []
     for url in cfg.get("feeds", []):
@@ -917,7 +920,7 @@ def check_aijobs(config, seen):
                 "detail": re.sub(r"<[^>]+>", " ", desc)[:160],
                 "url": link,
                 "matched": m.group(0),
-                "label": "JOB",
+                "label": "JOB · US-only?" if us_loc.search(f"{title} {desc}") else "JOB",
             })
         log(f"  - aijobs {url.rsplit('/',1)[-1]}: {len(items)} scanned, {kept} kept")
     return hits
