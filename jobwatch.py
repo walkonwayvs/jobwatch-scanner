@@ -15,6 +15,7 @@ Usage:
     python3 jobwatch.py --test       # one test message to Discord
 """
 
+import datetime
 import json
 import os
 import re
@@ -385,6 +386,27 @@ def check_github_repos(config, narrow, seen):
 
 
 
+def too_old(created, config):
+    """True if a discussion was opened more than discussion_max_age_days ago."""
+    days = int(config.get("discussion_max_age_days", 30))
+    if not created or days <= 0:
+        return False
+    try:
+        t = datetime.datetime.strptime(created[:19], "%Y-%m-%dT%H:%M:%S").replace(
+            tzinfo=datetime.timezone.utc).timestamp()
+    except ValueError:
+        return False
+    return time.time() - t > days * 86400
+
+
+def title_says_hiring(title, config):
+    """The title itself has to say someone is paying or hiring."""
+    pat = config.get("discussion_title_must")
+    if not pat:
+        return True
+    return re.search(pat, title or "", re.I) is not None
+
+
 def check_github_discussions(config, narrow, seen, token):
     """Watch repo Discussions - where community job posts actually start.
     Needs a token; Discussions have no RSS feed."""
@@ -404,7 +426,7 @@ def check_github_discussions(config, narrow, seen, token):
             continue
         q = ('{repository(owner:"%s",name:"%s"){discussions(first:15,'
              'orderBy:{field:UPDATED_AT,direction:DESC}){'
-             'nodes{title url body}}}}' % (owner, name))
+             'nodes{title url body createdAt}}}}' % (owner, name))
         body = json.dumps({"query": q}).encode("utf-8")
         req = urllib.request.Request(
             "https://api.github.com/graphql", data=body, headers=headers)
@@ -427,6 +449,9 @@ def check_github_discussions(config, narrow, seen, token):
             _t = n.get("title", "")
             _blk = config.get("discussion_block_title", "")
             if _blk and re.search(_blk, _t, re.I):
+                seen[key] = int(time.time())
+                continue
+            if too_old(n.get("createdAt"), config) or not title_says_hiring(_t, config):
                 seen[key] = int(time.time())
                 continue
             hit = narrow(_t)
@@ -483,6 +508,8 @@ def check_discussion_search(config, seen, token, narrow=None):
             repo = (n.get("repository") or {}).get("nameWithOwner", "")
             title = n.get("title", "")
             seen[key] = int(time.time())
+            if too_old(n.get("createdAt"), config) or not title_says_hiring(title, config):
+                continue
             hit = narrow(title) if narrow else q
             if not hit:
                 tl = title.lower()
