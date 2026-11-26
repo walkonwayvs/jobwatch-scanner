@@ -1209,7 +1209,8 @@ def main():
     hits = judge_hackathons(config, hits, seen, dry, first_run)
 
     seen = prune_seen(seen)
-    save_json_file(SEEN_PATH, seen)
+    if not dry:
+        save_json_file(SEEN_PATH, seen)
 
     if first_run:
         log(f"first run - {len(seen)} items marked as already seen")
